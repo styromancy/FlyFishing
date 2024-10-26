@@ -55,9 +55,6 @@ func _get_speed_multiplier():
 	return 1.0
 
 func _get_input():
-#	if Input.is_action_just_pressed("toggle_fly"):
-#		_toggle_flight()
-
 	if not flying:
 		return
 
