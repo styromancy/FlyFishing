@@ -1,4 +1,4 @@
-# BlueberryWolfi.FlyFishing
+# FlyFishing
 Flying Mod for for WEBFISHING using GDWeave
 
 I am too exhausted to make a proper usage docs but
