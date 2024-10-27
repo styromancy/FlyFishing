@@ -17,5 +17,5 @@ The default keybinds are:
 * F3: Toggle Fly
 
 ## Requirements
-* Ensure [GDWeave](https://github.com/NotNite/GDWeave) is installed to use these APIs.
+* Ensure [GDWeave](https://github.com/NotNite/GDWeave) is installed to use these mods.
 * Ensure [My APIs](https://github.com/BlueberryWolf/APIs/releases/latest/download/BlueberryWolfi.APIs.zip) are properly installed to use FlyFishing
