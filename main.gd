@@ -18,6 +18,11 @@ var in_game = false
 var PlayerAPI
 var KeybindsAPI
 
+var sprinting
+var sneaking
+
+var default_collision_mask
+
 func _ready():
 	KeybindsAPI = get_node_or_null("/root/BlueberryWolfiAPIs/KeybindsAPI")
 	PlayerAPI = get_node_or_null("/root/BlueberryWolfiAPIs/PlayerAPI")
@@ -36,6 +41,7 @@ func _fly_ready():
 	KeybindsAPI.connect(toggle_fly_signal, self, "_toggle_flight")
 	
 	player = PlayerAPI.local_player
+	default_collision_mask = player.collision_mask
 	print("flyfishing player init ", player.name)
 
 func _physics_process(delta):
@@ -45,8 +51,8 @@ func _physics_process(delta):
 	_process_movement(delta)
 
 func _get_speed_multiplier():
-	var sprinting = not Input.is_action_pressed("move_sneak") and Input.is_action_pressed("move_sprint")
-	var sneaking = Input.is_action_pressed("move_sneak") and not Input.is_action_pressed("move_sprint")
+	sprinting = not Input.is_action_pressed("move_sneak") and Input.is_action_pressed("move_sprint")
+	sneaking = Input.is_action_pressed("move_sneak") and not Input.is_action_pressed("move_sprint")
 	
 	if sprinting:
 		return player.boost_mult * BOOST_MULTI
@@ -85,13 +91,15 @@ func _toggle_flight():
 	
 	if flying:
 		print("flying start")
-		player.animation_data["sprinting"] = true
+		player.animation_data["dive"] = true
 		player.freecamming = true
+		player.set_collision_mask_bit(0, false)
 		PlayerData._send_notification("Now flying", 0)
 	else:
 		print("flying stop")
-		player.animation_data["sprinting"] = false
+		player.animation_data["dive"] = false
 		player.freecamming = false
+		player.set_collision_mask_bit(0, true)
 		PlayerData._send_notification("No longer flying", 1)
 		player.rotation = player.cam_base.rotation
 
@@ -101,7 +109,10 @@ func _process_movement(delta):
 
 func _process_flight_movement(delta):
 	var target_speed = FLIGHT_SPEED * _get_speed_multiplier()
-	player.diving = false
+	if sprinting:
+		player.diving = true
+	else:
+		player.diving = false
 
 	flight_velocity = flight_velocity.move_toward(
 		flight_direction.normalized() * target_speed,
@@ -111,3 +122,4 @@ func _process_flight_movement(delta):
 	final_velocity = lerp(final_velocity, flight_velocity + Vector3(0, vertical_velocity, 0), delta * DELTA_DAMP)
 	player.rotation = lerp(player.rotation, player.camera.rotation, delta * DELTA_DAMP)
 	player.move_and_slide(final_velocity)
+	
